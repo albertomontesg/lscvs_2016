@@ -2,7 +2,7 @@
 REPORT_FILE=paper.tex
 BUILD_NAME=lscvs_2016
 DEFAULT_READER=Preview.app
-BUILD_DIR=./doc
+BUILD_DIR=doc
 
 # The first rule in a Makefile is the one executed by default ("make"). It
 # should always be the "all" rule, so that "make" and "make all" are identical.
@@ -25,4 +25,4 @@ read:
 	open -a $(DEFAULT_READER) $(BUILD_DIR)/$(BUILD_NAME).pdf
 
 clean:
-	find $(BUILD_DIR) -type f ! -name '$(BUILD_NAME).pdf' -delete
+	find $(BUILD_DIR)/ -type f ! -name '$(BUILD_NAME).pdf' -delete
