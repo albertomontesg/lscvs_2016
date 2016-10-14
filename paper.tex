@@ -20,6 +20,7 @@
 \usepackage{amsfonts}       % blackboard math symbols
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
+\usepackage{amsmath}        % equations
 
 \title{Temporal Activity Detection in Untrimmed Videos with RNN}
 
@@ -65,24 +66,107 @@
 
 \section{Introduction}
 
-Recognizing activities in videos has become a hot topic over the last years due to the continuous increase of video cameras devices and online repositories. 
+Recognizing activities in videos has become a hot topic over the last years due to the continuous increase of video cameras devices and online repositories.
 This large amount of data requires an automatic indexing to be accessed after capture.
 The recent advances in video coding, storage and computational resources have boosted research in the field towards new and more efficient solutions for organizing and retrieving video content.
 
 Impressive progress has been reported in the recent literature for video classification %% cites
-Recently it was starting facing the challenge to detect activities in untrimmed videos and this motivate another challenge topic: temporal localization of activities in videos. This task present a lot of real applications such as automatic trimmed of videos to keep the most interesting part. The possibilities are endless.
+Recently it was starting facing the challenge to detect activities in untrimmed videos and this motivate another challenging topic: temporal localization of activities in videos.
+This task present a lot of real applications such as automatic trimmed of videos to keep the most interesting part.
+We wanted to face this challenge and that is why we propose a simple pipeline which can be able to perform in both tasks. Our proposal consist in a Convolutional Neural Network to exploit spatial and short temporal correlations and then a Recurrent Neural Network which exploits long temporal correlations.
 
-\section{Related Work}
+\section{Related work}
 
-The activity classification and temporal location tasks have been faced lately in Challenges such as the THUMOS~\cite{THUMOS15} and UCF101~\cite{UCF101}. 
+The activity classification and temporal localization tasks have been proposed with datasets such as Sports1M~\cite{KarpathyCVPR14}, THUMOS~\cite{THUMOS15} or ActivityNet~\cite{caba2015activitynet} published in the recents years. Many frameworks have been proposed to solve this tasks.
+Most of them use a Convolutional Neural Network to exploit the spatial correlations at each frame of the video such as in~\cite{gkioxari2015contextual,yeung2015end,ballas2015delving}.
+But as videos also present temporal correlations, the combination of the frames information and the computed optical flow has been used~\cite{wang2015towards} in a CNN to improve the results.
+
+Recently, was proposed by~\cite{tran2014learning} a new CNN which use 3D convolutions instead of 2D and apply them into chunks of video frames to classify videos. This 3D convolutions exploits short temporal correlations between frames and have demonstrated to work well in classifying videos~\cite{tran2014learning,tran2015deep}.
+In addition to this solutions, it has been proposed~\cite{shoutemporal} a multi-stage 3D CNN in order to predict temporal localization in videos in addition to the classification.
+
+Finally, in relation with the temporal localization of activities, it has been proposed the use of Recurrent Neural Networks.
+This networks exploit long and short temporal correlations and this caracteristic make them very suitable for video applications.
+It has been proposed the usage of RNN after CNN~\cite{yao2015describing} and also using reinforcement learning~\cite{yeung2015every} to temporally localize activities in videos.
+
+\section{Details of the proposed network}
+
+\paragraph{3D Convolutional Neural Network.}
+First, each video is split in clips of 16 frames and then each clip is resized ot 171 (width) $\times$ 128 (heigh) pixels.
+This is the input size of the C3 ConvNet proposed in~\cite{tran2014learning}.
+This network conducts 3D convolutions/pooling which operates in spatial and temporal dimensions simultaneously, and therefore can capture both appearance and motion.
+All 3D pooling layers use a 2$\times$2 max pooling with stride 2 in spatial dimensions, the same kernel size as in the temporal dimension except the first pooling layer (\texttt{pool1}) which has kernel size 1 and stride 1. All 3D convolutional filters have kernel size 3 and stride 1 in all dimensions.
+
+The network architecture used is the same as in the original paper except that it has been decided to work on the next stage with the values obtained at the \texttt{fc6} layer as feature vector for each 16-frame clip. The specifications of the network layers as well as the number of kernels by layer is the following one: \texttt{conv1(64) - pool1 - conv2a(128) - pool2 - conv3a(256) - conv3b(256) - pool3 - conv4a(512) - conv4b(512) - pool4 - conv5a(512) - conv5b(512) - pool(5) - fc6(4096)}.
+
+This 3D ConvNet was trained on Sports1M training subset~\cite{tran2014learning} and the resulting network weights were used to extract feature vectors for our network.
+
+\paragraph{Recurrent Neural Network.}
+The next step is to use a RNN to exploit long temporal correlations between video clips. Our proposal consist on using LSTM cells thanks to its long term memory.
+The network has been design to given a sequence of features vectors, return a sequence of classes corresponding the probability of each clip belong to one of the classes of the dataset.
+To avoid overfitting it has been dropout before and after the recurrent layers with probabily $p = .5$. Also the output correspond to a Softmax with the same number of outputs as number of classes $K$ plus the background class.
+
+The recurrent network have the following architecture: \texttt{input(4096) - dropout(.5) - N $\times$ lstm(c) - dropout(.5) - softmax(K+1)}. Different configurations of the number of LSTM layers $M$ and the number of cells $c$ has been tested in order to find the one with best performance.
+
+\paragraph{Training procedure.}
+From our proposed network, only the second stage was trained due to computational restrictions and the fact that the first stage was already trained with a video dataset.
+To train the recurrent network with the extracted features, was found that most of the videos had a clip length larger than a valid timestep at training, so a stateful approach was used at training where the memory was not reset between batches and at the same batch position was placed the continuation of the features of the previous seen video.
+
+In addition to this, it was also required to weight the loss function due to the imbalance of the output classes where the background instances present a higher frequence of appearance. The loss used at training was the categorical cross entropy and the weigthed for is as follows, where $q$ is the predicted probability distribution and $p$ the ground truth probability distribution:
+
+\begin{equation}
+    H(p,q) = - \sum_x \alpha(x) p(x) \log (q(x)), \text{ where } \alpha(x) =
+    \begin{cases}
+        \rho, & x = \text{background instance}\\
+        1,    & \text{otherwise}
+    \end{cases}
+\end{equation}
+
+\paragraph{Post-Processing.}
+The prediction of the recurrent network consist on a sequence of probabilities corresponding to each of the classes at the dataset.
+The goal of this network is to be able to classify globaly the video given at the input and also the temporal localization of the activity previously classified. To achieve so, some post-processing is required. To classify the video, the mean is computed along all the sequence predicted as follows:
+
+\begin{equation}
+	p_{video}(x) = \frac{1}{T_{video}} \sum_i^{video} p_i(x), \text{where } x \in \{ \text{Dataset Activities}\}
+\end{equation}
+
+where $T_{video}$ is the length of the video in number of 16-frames clips. From the obtain probability of the video to belong to each of the classes, the class with the maximum probability is chosen for the classification task.
+
+On the other hand, to obtain the temporal localization of the class previously predicted, first is passed the sequence of probabilities in a mean filter of $k$ samples to smooth the values along time space as in Equation~\ref{eq:smooth}. Then the probability of activity is computed at each step of the sequence such as in Equation~\ref{eq:activity_probability}. Finally a threshold $\gamma$ is set and all the clips with an activity probability higher than $\gamma$ are considered for detection.
+
+\begin{equation}
+	\tilde{p}_i(x) = \frac{1}{2k} \sum_{j=i-k}^{i+k} p_i(x)
+    \label{eq:smooth}
+\end{equation}
+
+\begin{equation}
+    \label{eq:activity_probability}
+	\tilde{p}^a_i = \sum_{x=1}^{200}\tilde{p}_i(x), \text{where } x = \begin{cases}
+        0, & \text{background class} \\
+        i, & 1 \leq i \leq 200 \text{ activity classes}
+    \end{cases}
+\end{equation}
+
+\section{Experiments}
+
+\subsection{Dataset}
+
+Talk about ActivityNet dataset
+
+\subsection{Network configurations}
+
+Talk about different values of N and c
+
+\subsection{Post-processing parameters}
+
+talk about different experiments with values of $\gamma$ and k
+
+\section{Conclusion}
+
+Explain conclusion
 
 
 
-
-
-
-
-\section*{References}
+\section*{}
 {\small
 \bibliographystyle{plainnat}
 \bibliography{references}
