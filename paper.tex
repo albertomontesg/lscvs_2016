@@ -229,86 +229,6 @@ This results indicate that all the networks presented high learning capacity ove
 Once the architecture has been chosen to obtain the best performance in the classification task, some experiments with different values of $k$ and $\gamma$ for the post-processing were performed.
 At Table~\ref{table:detection_postprocessing_comparison} there is the results for the temporal activity localization task, where can be seen that the effect of a mean filter to smooth helps improving the localization.
 
-
-
-
-% \begin{table}[h]
-% \begin{center}
-% \begin{tabular}{|l|c|c|}
-% \hline
-% \textbf{Architecture} & \textbf{mAP} & \textbf{Hit@3} \\
-% \hline\hline
-% 3 x 1024-LSTM & 0.5635 & 0.7437 \\
-% 2 x 512-LSTM & 0.5492 & 0.7364 \\
-% 1 x 512-LSTM & \bf0.5938 & \bf0.7576 \\
-% \hline
-% \end{tabular}
-% \end{center}
-% \caption{Results for classification task comparing different deep architectures. All values with
-%          only video features on the validation dataset.}
-% \label{table:classification_by_architecture}
-% \end{table}
-%
-% \begin{table}[h]
-% \begin{center}
-% \begin{tabular}{|l|c|c|c|}
-% \hline
-% \textbf{$\gamma$} & \textbf{$k=0$} & \textbf{$k=5$} & \textbf{$k=10$} \\
-% \hline
-% \textbf{0.2} & 0.20732 & \bf0.22513 & 0.22136 \\
-% \textbf{0.3} & 0.19854 & 0.22077 & 0.22100 \\
-% \textbf{0.5} & 0.19035 & 0.21937 & 0.21302 \\
-% \hline
-% \end{tabular}
-% \end{center}
-% \caption{mAP with an IOU threshold of $0.5$ over validation dataset. Here there is a comparison
-% between values of $k$ and $\gamma$ on post processing.}
-% \label{table:detection_postprocessing_comparison}
-% \end{table}
-% \end{multicols}
-
-% \begin{figure}
-% \centering
-% \subfloat[][]{
-% \begin{table}[h]
-% \begin{center}
-% \begin{tabular}{|l|c|c|}
-% \hline
-% \textbf{Architecture} & \textbf{mAP} & \textbf{Hit@3} \\
-% \hline\hline
-% 3 x 1024-LSTM & 0.5635 & 0.7437 \\
-% 2 x 512-LSTM & 0.5492 & 0.7364 \\
-% 1 x 512-LSTM & \bf0.5938 & \bf0.7576 \\
-% \hline
-% \end{tabular}
-% \end{center}
-% \caption{Results for classification task comparing different deep architectures. All values with
-%          only video features on the validation dataset.}
-% \label{table:classification_by_architecture}
-% \end{table}
-% }
-% \qquad
-% \begin{table}[h]
-% \begin{center}
-% \begin{tabular}{|l|c|c|c|}
-% \hline
-% \textbf{$\gamma$} & \textbf{$k=0$} & \textbf{$k=5$} & \textbf{$k=10$} \\
-% \hline
-% \textbf{0.2} & 0.20732 & \bf0.22513 & 0.22136 \\
-% \textbf{0.3} & 0.19854 & 0.22077 & 0.22100 \\
-% \textbf{0.5} & 0.19035 & 0.21937 & 0.21302 \\
-% \hline
-% \end{tabular}
-% \end{center}
-% \caption{mAP with an IOU threshold of $0.5$ over validation dataset. Here there is a comparison
-% between values of $k$ and $\gamma$ on post processing.}
-% \label{table:detection_postprocessing_comparison}
-% \end{table}
-%
-% \end{figure}
-
-
-
 In the Figure~\ref{fig:example_results} is shown some examples of the temporal localization prediction for some instances of the dataset. It can be seen how the predictions are continuous and smooth and mostly overlaps with the ground truth instances.
 
 \begin{figure}[ht]
@@ -329,7 +249,7 @@ In the Figure~\ref{fig:example_results} is shown some examples of the temporal l
 
 We propose a simple pipeline which can be able to perform in classification and temporal localization on activities on videos. Moreover, the flexibility of this sequence to sequence prediction allows the proposed network to face tasks where more than a single activity is present in the video.
 
-
+% ALBERTO: que més explico a les conclusions
 
 In the future, we would like to extend the work training all the pipeline end-to-end, including the 3D-CNN and improve the accuracy accuracy obtained.
 
