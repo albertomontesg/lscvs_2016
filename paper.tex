@@ -118,7 +118,7 @@ We use the 3D-CNN model proposed in~\cite{tran2014learning} to extract features 
 
 \subsection{Recurrent Neural Network}
 \label{sec:architecture}
-Next, we design a network that takes a sequence of 3D-CNN-f6 features from a video, and returns a sequence of class probabilities for each element in the sequence. We use LSTM layers, followed with dropout with $p = .5$ and a fully connected layer with a softmax activation. Figure~\ref{fig:global_pipeline} shows the proposed architecture. Different configurations of the number of LSTM layers and the number of cells have been tested and will be reviewed in the following sections.
+Next, we design a network that takes a sequence of 3D-CNN-f6 features from a video, and returns a sequence of class probabilities for each element in the sequence. We use LSTM layers, followed with dropout with $p = 0.5$ and a fully connected layer with a softmax activation. Figure~\ref{fig:global_pipeline} shows the proposed architecture. Different configurations of the number of LSTM layers and the number of cells have been tested and will be reviewed in the following sections.
 
 \begin{figure}[ht]
 \centering
@@ -179,7 +179,7 @@ We train the network described in Section~\ref{sec:architecture} with the negati
     \label{eq:loss}
 \end{equation}
 
-where $q$ is the predicted probability distribution and $p$ the ground truth probability distribution. In our experiments, we set $\rho$ = .3.
+where $q$ is the predicted probability distribution and $p$ the ground truth probability distribution. In our experiments, we set $\rho = 0.3$.
 
 The network was trained with a 256 batch size and 20 \textit{timesteps} as input sequence.
 The optimezer function used was the RMSprop~\cite{dauphin2015rmsprop} with a learning rate set to $10^{-5}$. In total the network was trained with 100 epochs.
