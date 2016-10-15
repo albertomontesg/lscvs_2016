@@ -181,8 +181,8 @@ We train the network described in Section~\ref{sec:architecture} with the negati
 
 where $q$ is the predicted probability distribution and $p$ the ground truth probability distribution. In our experiments, we set $\rho = 0.3$.
 
-The network was trained with a 256 batch size and 20 \textit{timesteps} as input sequence.
-The optimezer function used was the RMSprop~\cite{dauphin2015rmsprop} with a learning rate set to $10^{-5}$. In total the network was trained with 100 epochs.
+The network was trained with batches of 256 samples, back-propagating the error during 20 time-steps per sample.
+The optimizer function used was the RMSprop~\cite{dauphin2015rmsprop} with a learning rate set to $10^{-5}$. In total the network was trained with 100 epochs.
 
 % AMAIA: Aquí tambe hauries d'afegir el numero de iteracions (o epochs), learning rate, optimizer, batch size. Si el tens, el temps d'entrenament en la GPU que entrenessis.
 % ALBERTO: FET
