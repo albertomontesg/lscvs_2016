@@ -103,7 +103,7 @@ Later on, 3D-CNNs were proposed in~\cite{tran2014learning} (known as C3D), which
 
 For temporal activity detection, recent works have proposed the usage of Long Short-Term Memory units (LSTM)~\cite{hochreiter1997long}.
 LSTMs are a type of RNNs that are able to better exploit long and short temporal correlations in sequences, which makes them suitable for video applications.
-LSTMs have been used alongside CNNs for video classification~\cite{yao2015describing} and activity localization in videos~\cite{yeung2015every}. 
+LSTMs have been used alongside CNNs for video classification~\cite{yao2015describing} and activity localization in videos~\cite{yeung2015every}.
 
 In this paper, we combine the capabilities of both 3D-CNNs and RNNs into a single framework. This way, we design a simple network that takes a sequence of video features from the C3D model~\cite{tran2014learning} as input to a RNN and is able to classify each one of them into an activity category.
 
@@ -126,9 +126,9 @@ We use the C3D model proposed in~\cite{tran2014learning} to extract features for
 
 \subsection{Architecture}
 \label{sec:architecture}
-We design a network that processes a sequence of C3D-f6 features from a video, and returns a sequence of class probabilities for each 16-frames clip. 
-We use LSTM layers, trained with dropout with probability $p = 0.5$ and a fully connected layer with a softmax activation. Figure~\ref{fig:global_pipeline} shows the proposed architecture. 
-Different configurations of the number of LSTM layers $N$ and the number of cells $c$ have been tested and are compared in Section~\ref{sec:resultats}. 
+We design a network that processes a sequence of C3D-f6 features from a video, and returns a sequence of class probabilities for each 16-frames clip.
+We use LSTM layers, trained with dropout with probability $p = 0.5$ and a fully connected layer with a softmax activation. Figure~\ref{fig:global_pipeline} shows the proposed architecture.
+Different configurations of the number of LSTM layers $N$ and the number of cells $c$ have been tested and are compared in Section~\ref{sec:resultats}.
 Our proposed system has the following architecture: \texttt{input(4096) - dropout(0.5) - N $\times$ lstm(c) - dropout(.5) - softmax(K+1)} where $K$ is the number of activity classes at the dataset.
 
 \begin{figure}[ht]
@@ -240,7 +240,8 @@ We evaluate our models using the metrics proposed in ActivityNet Challenge. For 
 Table~\ref{table:classification_by_architecture} shows the performance of different network architectures. We tested configurations with different number of LSTM layers and different number of cells. These results indicate that all the networks presented high learning capacity over the data, but some over-fitting was observed with the deeper architectures, obtaining the best results with a single layer of 512-LSTM cells.
 
 Fixing the architecture, we performed experiments for the temporal detection task using different values of $k$ and $\gamma$ in the post-processing stage.
-Table~\ref{table:detection_postprocessing_comparison} shows results for the temporal activity localization task, where the effect of a mean smoothing filter can be seen, improving the localization performance. Figure~\ref{fig:example_results} shows some examples of the temporal localization prediction for some instances of the dataset, showing continuous and smooth segments.
+Table~\ref{table:detection_postprocessing_comparison} shows results for the temporal activity localization task, where the effect of a mean smoothing filter can be seen, improving the localization performance.
+Figures~\ref{fig:example_results_detect} and~\ref{fig:example_results_classification} shows some examples of classification and temporal localization prediction for some instances of the dataset, showing continuous and smooth segments.
 % AMAIA: No sé si els exemples de la figura son els millors...no en tens algun on la detecció estigui bé pero la classe no? o al reves? No en vas posar algun a la presentacio de la defensa?
 % ALBERTO: Ja he ficat un exemple que passa el que tu dius
 % AMAIA: Vist
@@ -250,10 +251,28 @@ Table~\ref{table:detection_postprocessing_comparison} shows results for the temp
 \includegraphics[width=1\linewidth]{img/activity_temporal_localization_55.png}
 \includegraphics[width=1\linewidth]{img/activity_temporal_localization_20.png}
 %\includegraphics[width=1\linewidth]{img/activity_temporal_localization_35.png}
-\caption{Global architecture of the proposed pipeline.}
-\label{fig:example_results}
+\caption{Examples of temporal activity localization predictions.}
+\label{fig:example_results_detect}
 \end{figure}
 
+\begin{figure}[h]
+\centering
+\begin{subfigure}[b]{.4\textwidth}
+  \texttt{Video ID: ArzhjEk4j\_Y \\
+  Activity: Building sandcastles \\
+  \\
+  Prediction: \\
+  0.7896	Building sandcastles \\
+  0.0073	Doing motocross \\
+  0.0049	Beach soccer \\}
+\end{subfigure}%
+\begin{subfigure}[b]{.6\textwidth}
+  \centering
+\includegraphics[width=0.95\linewidth]{img/results_visualization_classification_1}
+\end{subfigure}
+\caption{Example of activity classification.}
+\label{fig:example_results_classification}
+\end{figure}
 
 % AMAIA: Crec que amb una secció on expliquis tots els experiments ja n'hi ha prou. Li he posat el nom de 'Results'
 
@@ -261,7 +280,7 @@ Table~\ref{table:detection_postprocessing_comparison} shows results for the temp
 % ALBERTO: crec que potser una segona figura no hi cab...posar-la a annexes potser???
 \section{Conclusion}
 
-In this paper we propose a simple pipeline for both classification and temporal localization of activities in videos. Our system achieves competitive results on both tasks. The sequence to sequence nature of the proposed network offers flexibility to extend it to face more challenging tasks in video processing, e.g. where more than a single activity is present in the video. Future work will address end to end training of the model (3D-CNN + RNN), to learn better feature representations suitable for the dataset. 
+In this paper we propose a simple pipeline for both classification and temporal localization of activities in videos. Our system achieves competitive results on both tasks. The sequence to sequence nature of the proposed network offers flexibility to extend it to face more challenging tasks in video processing, e.g. where more than a single activity is present in the video. Future work will address end to end training of the model (3D-CNN + RNN), to learn better feature representations suitable for the dataset.
 
 % ALBERTO: que més explico a les conclusions???
 
