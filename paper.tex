@@ -224,10 +224,11 @@ For temporal localization, a prediction is marked correct only when it has the c
 \end{table}
 
 The first results are related with the network architecture. It has been tested with different number of layers and different number of cells having all the layers the same number of cells. The results can be found in Table~\ref{table:classification_by_architecture}.
-This results indicate that all the networks presented high learning capacity over the data ans it was obeseved a little over-fitting with the deeper architectures, obtainng the best results with a single layer of 512-LSTM cells.
+This results indicate that all the networks presented high learning capacity over the data, but a little over-fitting was observed with the deeper architectures, obtainng the best results with a single layer of 512-LSTM cells.
 
 Once the architecture has been chosen to obtain the best performance in the classification task, some experiments with different values of $k$ and $\gamma$ for the post-processing were performed.
-At Table~\ref{table:detection_postprocessing_comparison} there is the results for the temporal activity localization task, where can be seen that the effect of a mean filter to smooth helps improving the localization.
+At Table~\ref{table:detection_postprocessing_comparison} there are the results for the temporal activity localization task, where the effect of a mean smoothing filter can be seen, improving the localization.
+%there is the results for the temporal activity localization task, where can be seen that the effect of a mean filter to smooth helps improving the localization.
 
 In the Figure~\ref{fig:example_results} is shown some examples of the temporal localization prediction for some instances of the dataset. It can be seen how the predictions are continuous and smooth and mostly overlaps with the ground truth instances.
 
@@ -247,11 +248,12 @@ In the Figure~\ref{fig:example_results} is shown some examples of the temporal l
 % ALBERTO: crec que potser una segona figura no hi cab...posar-la a annexes potser???
 \section{Conclusion}
 
-We propose a simple pipeline which can be able to perform in classification and temporal localization on activities on videos. Moreover, the flexibility of this sequence to sequence prediction allows the proposed network to face tasks where more than a single activity is present in the video.
+We propose a simple pipeline which can be able to perform well in classification and temporal localization on activities on videos.
+Moreover, the flexibility of this sequence to sequence prediction allows the proposed network to face tasks where more than a single activity is present in the video.
 
 % ALBERTO: que més explico a les conclusions
 
-In the future, we would like to extend the work training all the pipeline end-to-end, including the 3D-CNN and improve the accuracy accuracy obtained.
+In the future, we would like to extend the work training all the pipeline end-to-end, including the 3D-CNN and improve the accuracy obtained.
 
 \section*{}
 {\small
