@@ -198,3 +198,6 @@ TSWLatexianTemp*
 
 # AutoBuilding
 doc/
+
+# macOS
+.DS_Store
