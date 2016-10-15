@@ -104,7 +104,8 @@ Later on, 3D-CNNs were proposed in~\cite{tran2014learning} (known as C3D), which
 For temporal activity detection, recent works have proposed the usage of Long Short-Term Memory units (LSTM)~\cite{hochreiter1997long}.
 LSTMs are a type of RNNs that are able to better exploit long and short temporal correlations in sequences, which makes them suitable for video applications.
 LSTMs have been used alongside CNNs for video classification~\cite{yao2015describing} and activity localization in videos~\cite{yeung2015every}. 
-Our proposed network is inspired by this solutions using the C3D that so well perform in video, and also a RNN which will exploit long temporal correlations and allows to predict a sequence.
+
+In this paper, we combine the capabilities of both 3D-CNNs and RNNs into a single framework. This way, we design a simple network that takes a sequence of video features from the C3D model~\cite{tran2014learning} as input to a RNN and is able to classify each one of them into an activity category.
 
 % AMAIA: Aquí falta una frase que digui què fem diferent nosaltres, en què ens assemblem a l'estat de l'art...
 
@@ -126,7 +127,9 @@ We use the C3D model proposed in~\cite{tran2014learning} to extract features for
 \subsection{Architecture}
 \label{sec:architecture}
 We design a network that processes a sequence of C3D-f6 features from a video, and returns a sequence of class probabilities for each 16-frames clip. 
-We use LSTM layers, trained with dropout with $p = 0.5$ and a fully connected layer with a softmax activation. Figure~\ref{fig:global_pipeline} shows the proposed architecture. Different configurations of the number of LSTM layers $N$ and the number of cells $c$ have been tested and are compared in Section~\ref{sec:resultats}. Our proposed system has the following architecture: \texttt{input(4096) - dropout(0.5) - N $\times$ lstm(c) - dropout(.5) - softmax(K+1)} where $K$ is the number of activity classes at the dataset.
+We use LSTM layers, trained with dropout with probability $p = 0.5$ and a fully connected layer with a softmax activation. Figure~\ref{fig:global_pipeline} shows the proposed architecture. 
+Different configurations of the number of LSTM layers $N$ and the number of cells $c$ have been tested and are compared in Section~\ref{sec:resultats}. 
+Our proposed system has the following architecture: \texttt{input(4096) - dropout(0.5) - N $\times$ lstm(c) - dropout(.5) - softmax(K+1)} where $K$ is the number of activity classes at the dataset.
 
 \begin{figure}[ht]
 \centering
@@ -153,10 +156,10 @@ We consider the class with maximum predicted probability as the predicted class.
 %where $T$ is number of video clips of 16 frames in the video.
 % AMAIA: No cal posar l'equació de la mitja...
 
-To obtain the temporal localization of the predicted activity class, we first apply a mean filter of $k$ samples to the predicted sequence to smooth the values through time (see equation~\ref{eq:smooth}).
+To obtain the temporal localization of the predicted activity class, we first apply a mean filter of $k$ samples to the predicted sequence to smooth the values through time (see Equation~\ref{eq:smooth}).
 Then, the probability of \textit{activity} (vs \textit{no activity}) is predicted for each 16-frames clip, being the \textit{activity} probability the sum of all probabilities of activity classes, and the \textit{no activity} probability, the one assigned to the background class.
 Finally, only those clips with an \textit{activity} probability over a threshold $\gamma$ are kept and labeled with the previously predicted class.
-Notice that, in our dataset, each video can only contain video segments of the same activity class.
+Notice that, for each video, all predicted temporal detections are activity class.
 %a threshold $\gamma$ is set and all clips with probability higher than $\gamma$ are considered as part of the detected temporal segment for the previously assigned activity.
 
 \begin{equation}
@@ -202,7 +205,7 @@ The network was trained for 100 epochs, with a batch size of 256, where each sam
 \subsection{Results}
 \label{sec:resultats}
 
-We evaluate our methods with the mean average precision (mAP), which is the metric used in ActivityNet Challenge with regard to classification and temporal activity localization as a retrieval problem. For temporal localization, a prediction is marked correct only when it has the correct category and has IoU with ground truth instance larger than $0.5$.
+We evaluate our models using the metrics proposed in ActivityNet Challenge. For video classification, we use mean average precision (mAP) and Hit@3. For temporal localization, a prediction is marked correct only when it has the correct category and has IoU with ground truth instance larger than $0.5$, and mAP is used to evaluate the performance over the entire dataset.
 
 \begin{table}[h]
     \parbox{.45\linewidth}{
@@ -229,34 +232,36 @@ We evaluate our methods with the mean average precision (mAP), which is the metr
         0.5 & 0.19035 & 0.21937 & 0.21302 \\
         \end{tabular}
         \vspace{.2cm}
-        \caption{mAP with an IOU threshold of $0.5$ comparing between values of $k$ and $\gamma$ on post-processing.}
+        \caption{mAP with an IoU threshold of $0.5$ comparing between values of $k$ and $\gamma$ on post-processing.}
         \label{table:detection_postprocessing_comparison}
     }
 \end{table}
 
-Results in Table~\ref{table:classification_by_architecture} show the performance of different network configurations. We experimented with different number of LSTM layers and different number of cells. These results indicate that all the networks presented high learning capacity over the data, but over-fitting was observed with the deeper architectures, obtaining the best results with a single layer of 512-LSTM cells.
+Table~\ref{table:classification_by_architecture} shows the performance of different network architectures. We tested configurations with different number of LSTM layers and different number of cells. These results indicate that all the networks presented high learning capacity over the data, but some over-fitting was observed with the deeper architectures, obtaining the best results with a single layer of 512-LSTM cells.
 
-Once the architecture has been chosen to obtain the best performance in the classification task, some experiments with different values of $k$ and $\gamma$ for the post-processing were performed.
-Table~\ref{table:detection_postprocessing_comparison} shows results for the temporal activity localization task, where the effect of a mean smoothing filter can be seen, improving the localization. Figure~\ref{fig:example_results} shows some examples of the temporal localization prediction for some instances of the dataset. It can be seen how the predictions are continuous and smooth.
+Fixing the architecture, we performed experiments for the temporal detection task using different values of $k$ and $\gamma$ in the post-processing stage.
+Table~\ref{table:detection_postprocessing_comparison} shows results for the temporal activity localization task, where the effect of a mean smoothing filter can be seen, improving the localization performance. Figure~\ref{fig:example_results} shows some examples of the temporal localization prediction for some instances of the dataset, showing continuous and smooth segments.
 % AMAIA: No sé si els exemples de la figura son els millors...no en tens algun on la detecció estigui bé pero la classe no? o al reves? No en vas posar algun a la presentacio de la defensa?
-
+% ALBERTO: Ja he ficat un exemple que passa el que tu dius
+% AMAIA: Vist
 \begin{figure}[ht]
 \centering
 \includegraphics[width=1\linewidth]{img/activity_temporal_localization_8.png}
 \includegraphics[width=1\linewidth]{img/activity_temporal_localization_55.png}
 \includegraphics[width=1\linewidth]{img/activity_temporal_localization_20.png}
-\includegraphics[width=1\linewidth]{img/activity_temporal_localization_35.png}
-
+%\includegraphics[width=1\linewidth]{img/activity_temporal_localization_35.png}
 \caption{Global architecture of the proposed pipeline.}
 \label{fig:example_results}
 \end{figure}
+
+
 % AMAIA: Crec que amb una secció on expliquis tots els experiments ja n'hi ha prou. Li he posat el nom de 'Results'
 
 % AMAIA: Si aqui vols parlar del bias towards sport categories, hauries d'afegir la figura que tens que ho demostra.
 % ALBERTO: crec que potser una segona figura no hi cab...posar-la a annexes potser???
 \section{Conclusion}
 
-In this paper we propose a simple pipeline for both classification and temporal localization of activities in videos. Our system achieves competitive results on both tasks. The sequence to sequence nature of the proposed network offers flexibility to extend it to face more challenging tasks in video processing, e.g. where more than a single activity is present in the video. Future work will address end to end training of the model (3D-CNN + RNN), to learn better feature representations suitable for the dataset.
+In this paper we propose a simple pipeline for both classification and temporal localization of activities in videos. Our system achieves competitive results on both tasks. The sequence to sequence nature of the proposed network offers flexibility to extend it to face more challenging tasks in video processing, e.g. where more than a single activity is present in the video. Future work will address end to end training of the model (3D-CNN + RNN), to learn better feature representations suitable for the dataset. 
 
 % ALBERTO: que més explico a les conclusions???
 
