@@ -196,8 +196,5 @@ TSWLatexianTemp*
 # auto folder when using emacs and auctex
 /auto/*
 
-# AutoBuilding
-doc/
-
 # macOS
 .DS_Store
